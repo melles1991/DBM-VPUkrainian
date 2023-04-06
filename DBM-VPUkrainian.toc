@@ -1,0 +1,12 @@
+## Interface: 100007
+## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Voicepack Ukrainian|r
+## DefaultState: enabled
+## RequiredDeps: DBM-Core
+## Author: melles1991
+## Version: 1.0
+## X-DBM-Voice: 1
+## X-DBM-Voice-Name: Ukrainian Female
+## X-DBM-Voice-Name-ruRU: Українська жіноча
+## X-DBM-Voice-ShortName: Ukrainian
+## X-DBM-Voice-Version: 13
+## X-DBM-Voice-HasCount: 1
