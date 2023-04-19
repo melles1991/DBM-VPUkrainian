@@ -3,7 +3,7 @@
 ## DefaultState: enabled
 ## RequiredDeps: DBM-Core
 ## Author: melles1991
-## Version: alpha 1
+## Version: alpha 2
 ## X-DBM-Voice: 1
 ## X-DBM-Voice-Name: Ukrainian Female
 ## X-DBM-Voice-Name-ruRU: Українська жіноча
