@@ -1,3 +1,7 @@
+#### alpha 4
+* Added new voices
+* Restructuring and updating for CurseForge-specific features.
+
 #### alpha 3
 * Update aesoon.ogg.
 * Translated new voices.
