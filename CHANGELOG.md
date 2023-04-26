@@ -1,3 +1,6 @@
+#### alpha 5
+* fix some errors
+
 #### alpha 4
 * Added new voices
 * Restructuring and updating for CurseForge-specific features.
