@@ -1,3 +1,7 @@
+#### beta 1
+* Initial beta release (Translated approximately 50%)
+* Translated new voices.
+
 #### alpha 5
 * fix some errors
 
