@@ -1,3 +1,6 @@
+#### beta 3
+* Bump to DBM Voice Version 14
+
 #### beta 2
 * Bump to WoW 10.1
 * Translated new voices.
