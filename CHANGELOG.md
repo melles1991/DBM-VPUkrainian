@@ -1,3 +1,7 @@
+#### beta 2
+* Bump to WoW 10.1
+* Translated new voices.
+
 #### beta 1
 * Initial beta release (Translated approximately 50%)
 * Translated new voices.
