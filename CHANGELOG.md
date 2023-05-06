@@ -1,3 +1,7 @@
+#### beta 4
+* Translated new voices.
+* Added up volume to some voices.
+
 #### beta 3
 * Bump to DBM Voice Version 14
 
