@@ -1,3 +1,9 @@
+#### beta 4.3
+
+- Added up volume to some voices.
+- Updaded some voices.
+- Translated new voices.
+
 #### beta 4.2
 
 - Now support Classic, BCC, WLK
