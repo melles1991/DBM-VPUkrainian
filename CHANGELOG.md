@@ -1,3 +1,7 @@
+#### beta 4.4
+
+- Translated new voices.
+
 #### beta 4.3
 
 - Added up volume to some voices.
