@@ -1,5 +1,7 @@
-#### beta 5.0
+#### 11.7
 
-- Update TOC for retail patch 10.1.5
-- Update TOC for WLK classic patch 3.4.2
-- Translated new voices.
+- Update TOC for Retail patch 10.1.7
+- Update TOC for Classic
+- Added new frontal.ogg
+- Module subtype from DBM
+- Added IconTexture reference from DBM.
