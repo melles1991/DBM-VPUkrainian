@@ -1,5 +1,4 @@
-#### 11.7
+#### 1.3
 
-- Update TOC for Retail patch 10.2.0
-- Update TOC for Wrath
-- Added new flameyou, shadowyou, seedyou, movetopool ogg
+- Update TOC for Retail patch 10.2.5
+- Add DPS voices

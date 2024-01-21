@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## Interface-Classic: 11404
 ## Interface-BCC: 20504
 ## Interface-Wrath: 30403
@@ -9,11 +9,11 @@
 ## DefaultState: enabled
 ## RequiredDeps: DBM-Core
 ## Author: melles1991
-## Version: 1.2
+## Version: 1.3
 ## IconTexture: Interface\AddOns\DBM-Core\textures\dbm_airhorn
 ## X-Curse-Project-ID: 852433
 ## X-DBM-Voice: 1
-## X-DBM-Voice-Name: Ukrainian Female
+## X-DBM-Voice-Name: Українська жіноча
 ## X-DBM-Voice-Name-ruRU: Українська жіноча
 ## X-DBM-Voice-ShortName: Ukrainian
 ## X-DBM-Voice-Version: 15
