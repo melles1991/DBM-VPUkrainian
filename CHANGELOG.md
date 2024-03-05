@@ -1,4 +1,4 @@
-#### 1.3
+#### 1.4.3
 
-- Update TOC for Retail patch 10.2.5
-- Add DPS voices
+- Translated new voices.
+- Correct support Classic, WLK
