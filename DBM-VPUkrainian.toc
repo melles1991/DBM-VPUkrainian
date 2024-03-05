@@ -16,8 +16,8 @@
 ## IconTexture: Interface\AddOns\DBM-Core\textures\dbm_airhorn
 ## X-Curse-Project-ID: 852433
 ## X-DBM-Voice: 1
-## X-DBM-Voice-Name: Українська жіноча
-## X-DBM-Voice-Name-ruRU: Українська жіноча
+## X-DBM-Voice-Name: Ukrainian Female
+## X-DBM-Voice-Name-ruRU: Ukrainian Female
 ## X-DBM-Voice-ShortName: Ukrainian
 ## X-DBM-Voice-Version: 15
 ## X-DBM-Voice-HasCount: 1
