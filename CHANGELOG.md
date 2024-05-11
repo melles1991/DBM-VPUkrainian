@@ -1,4 +1,3 @@
-#### 1.4.3
+#### 1.4.4
 
-- Translated new voices.
-- Correct support Classic, WLK
+- Toc Bumps for retail to 10.2.7
