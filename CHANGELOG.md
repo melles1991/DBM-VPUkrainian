@@ -1,3 +1,5 @@
-#### 1.4.4
+#### 1.5
 
-- Toc Bumps for retail to 10.2.7
+- Toc Bumps
+- Add new voices.
+- Translated some voices.
