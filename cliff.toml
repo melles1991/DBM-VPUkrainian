@@ -1,0 +1,57 @@
+# git-cliff ~ default configuration file
+# https://git-cliff.org/docs/configuration
+
+[changelog]
+# changelog header
+header = """
+# Changelog\n
+All notable changes to this project will be documented in this file.\n
+"""
+# template for the changelog body
+body = """
+{% if version %}\
+    ## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}\
+    ### {{ group | upper_first }}\
+    {% for commit in commits %}\
+        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}\
+    {% endfor %}\
+{% endfor %}\n
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+
+commit_preprocessors = [
+  # можеш додати кастомну заміну тут, якщо треба
+]
+
+commit_parsers = [
+  { message = "^feat",     group = "🦸‍♂️ New Abilities" },
+  { message = "^fix",      group = "⚔️ Bug Fixes" },
+  { message = "^doc",      group = "📜 Lore & Documentation", skip = true },
+  { message = "^perf",     group = "💨 Performance Tweaks" },
+  { message = "^refactor", group = "🛠️ Code Refinements", skip = true },
+  { message = "^test",     group = "🎮 Testing Grounds" },
+  { message = "^chore",    group = "🔧 Miscellaneous Tasks", skip = true },
+  { message = "^ci",       group = "🛡️ Build & Continuous Integration", skip = true },
+  { message = "^build",    group = "🛠️ Build System", skip = true },
+  { body = ".*security",   group = "🕵️‍♂️ Security Enhancements" },
+]
+
+protect_breaking_commits = false
+filter_commits = false
+
+# Якщо хочеш пропускати певні теги
+# skip_tags = "v0.1.0-beta.1"
+# ignore_tags = "^v.*-alpha$"
+
+topo_order = false
+sort_commits = "oldest"
+limit_commits = 50
