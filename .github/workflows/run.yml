@@ -1,0 +1,53 @@
+name: Continuous Integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  create_release:
+    name: Create and Deploy Pre-release
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version and build number
+        id: get_version
+        run: |
+          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc | cut -d '.' -f1,2)
+          BUILD_NUMBER=${{ github.run_number }}
+          FINAL_VERSION="${BASE_VERSION}.${BUILD_NUMBER}"
+
+          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+          echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Поточна збірка: v$FINAL_VERSION"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.FINAL_VERSION }}"
+          name: "v${{ env.FINAL_VERSION }}"
+          prerelease: false
+
+      - name: Trigger workflow to publish new version
+        run: |
+          curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.REPO_ACCESS_TOKEN }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/LihvoDruida/DBM-VPUkrainian/actions/workflows/package.yml/dispatches \
+          -d '{"ref":"main"}'

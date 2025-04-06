@@ -1,57 +1,81 @@
 # git-cliff ~ default configuration file
 # https://git-cliff.org/docs/configuration
+#
+# Lines starting with "#" are comments.
+# Configuration options are organized into tables and keys.
+# See documentation for more information on available options.
 
 [changelog]
 # changelog header
 header = """
-# Changelog\n
-All notable changes to this project will be documented in this file.\n
+# Changelog
+All notable changes to this project will be documented in this file.
 """
 # template for the changelog body
 body = """
-{% if version %}\
-    ## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
-{% else %}\
+{% if version %}
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}
     ## [unreleased]
-{% endif %}\
-{% for group, commits in commits | group_by(attribute="group") %}\
-    ### {{ group | upper_first }}\
-    {% for commit in commits %}\
-        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}\
-    {% endfor %}\
-{% endfor %}\n
+{% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}
+    {% endfor %}
+{% endfor %}
 """
+# remove the leading and trailing whitespace from the template
 trim = true
 
 [git]
+# parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
+# filter out the commits that are not conventional
 filter_unconventional = true
+# process each line of a commit as an individual commit
 split_commits = false
-
+# regex for preprocessing the commit messages
 commit_preprocessors = [
-  # можеш додати кастомну заміну тут, якщо треба
+  # Uncomment and modify the following line to replace issue numbers
+  # { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](https://github.com/your-repo/issues/${2}))" }, 
 ]
 
+# Grouping commits based on their type with unique and thematic emojis
 commit_parsers = [
-  { message = "^feat",     group = "🦸‍♂️ New Abilities" },
-  { message = "^fix",      group = "⚔️ Bug Fixes" },
-  { message = "^doc",      group = "📜 Lore & Documentation", skip = true },
-  { message = "^perf",     group = "💨 Performance Tweaks" },
-  { message = "^refactor", group = "🛠️ Code Refinements", skip = true },
-  { message = "^test",     group = "🎮 Testing Grounds" },
-  { message = "^chore",    group = "🔧 Miscellaneous Tasks", skip = true },
-  { message = "^ci",       group = "🛡️ Build & Continuous Integration", skip = true },
-  { message = "^build",    group = "🛠️ Build System", skip = true },
-  { body = ".*security",   group = "🕵️‍♂️ Security Enhancements" },
+  { message = "^feat",    group = "🦸‍♂️ New Features" },               # New features (abilities, powers)
+  { message = "^fix",     group = "⚔️ Bug Fixes" },                    # Bug fixes (combat fixes, etc.)
+  { message = "^doc",     group = "📜 Documentation", skip = true },   # Documentation changes (skip)
+  { message = "^perf",    group = "💨 Performance Tweaks" },            # Performance improvements
+  { message = "^refactor",group = "🛠️ Code Refinements", skip = true }, # Code refactoring (cleanup, optimization)
+  { message = "^test",    group = "🎮 Testing & Validation" },          # Tests (game mechanics testing)
+  { message = "^chore",   group = "🔧 Miscellaneous Tasks", skip = true },  # Miscellaneous tasks (infrastructure)
+  { message = "^ci",      group = "🛡️ CI/Build" , skip = true },       # CI/build-related changes
+  { message = "^build",   group = "🛠️ Build System", skip = true },    # Build system changes (skip)
+  { body = ".*security",  group = "🕵️‍♂️ Security Fixes" },            # Security improvements
 ]
 
+# protect breaking changes from being skipped due to matching a skipping commit_parser
 protect_breaking_commits = false
+
+# filter out the commits that are not matched by commit parsers
 filter_commits = false
 
-# Якщо хочеш пропускати певні теги
-# skip_tags = "v0.1.0-beta.1"
-# ignore_tags = "^v.*-alpha$"
+# glob pattern for matching git tags
+[changelog]
+tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
 
+# regex for skipping tags (if needed, uncomment and modify the following line)
+# skip_tags = "v0.1.0-beta.1"
+
+# regex for ignoring tags (unreleased versions)
+ignore_tags = "^v.*-alpha$"
+
+# sort the tags topologically
 topo_order = false
+
+# sort the commits inside sections by oldest/newest order
 sort_commits = "oldest"
+
+# limit the number of commits included in the changelog.
 limit_commits = 50

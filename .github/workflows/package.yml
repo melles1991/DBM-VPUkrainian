@@ -12,20 +12,11 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Get base version from .toc file
-        id: get_version
-        run: |
-          FULL_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc)
-          FINAL_VERSION=$(echo "$FULL_VERSION" | cut -d '.' -f1,2)
-          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
-          echo "Version is $FINAL_VERSION"
 
       - name: Generate CHANGELOG.md
         uses: orhun/git-cliff-action@v2
@@ -34,17 +25,9 @@ jobs:
           args: --verbose
         env:
           OUTPUT: CHANGELOG.md
-          GIT_CLIFF__GIT__TAG_PATTERN: "v${{ env.FINAL_VERSION }}"
-
-      - name: Pack Addon
-        run: |
-          ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
-          zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ${GITHUB_WORKSPACE}/
-          echo "Addon packed as ${ZIP_NAME}"
-
-      - name: Deploy Addon
+          
+      - name: Deploy AddOn
         uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-          ADDON_FILE: ${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip
+          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}p
