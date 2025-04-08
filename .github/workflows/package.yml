@@ -53,13 +53,6 @@ jobs:
           echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
           echo "📦 Поточна збірка: v$FINAL_VERSION"
       
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: "v${{ env.FINAL_VERSION }}"
-          name: "v${{ env.FINAL_VERSION }}"
-          prerelease: false
-
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
 
@@ -71,17 +64,14 @@ jobs:
           ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
           zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ${GITHUB_WORKSPACE}/
           echo "Addon packed as ${ZIP_NAME}"
-
-      - name: Upload Release Assets
-        run: |
-          ZIP_FILE="${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip"
-          if [ -f "$ZIP_FILE" ]; then
-            echo "Uploading ZIP release asset: $ZIP_FILE"
-            gh release upload "v${{ env.FINAL_VERSION }}" "$ZIP_FILE" --repo ${{ github.repository }} --clobber
-          else
-            echo "File $ZIP_FILE not found, skipping upload."
-            exit 1
-          fi
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.FINAL_VERSION }}"
+          name: "v${{ env.FINAL_VERSION }}"
+          file: "${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip"
+          prerelease: false
 
       - name: Create and Upload Package
         uses: BigWigsMods/packager@v2
