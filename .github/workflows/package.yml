@@ -59,7 +59,6 @@ jobs:
           tag_name: "v${{ env.FINAL_VERSION }}"
           name: "v${{ env.FINAL_VERSION }}"
           prerelease: false
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}  # Використовуємо токен з правами на релізи
 
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
