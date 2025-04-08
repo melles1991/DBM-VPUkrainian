@@ -48,6 +48,13 @@ jobs:
           echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
           echo "📦 Поточна збірка: v$FINAL_VERSION"
       
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.FINAL_VERSION }}"
+          name: "v${{ env.FINAL_VERSION }}"
+          prerelease: false
+          
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
         
