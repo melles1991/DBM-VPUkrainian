@@ -35,15 +35,45 @@ jobs:
             exit 1
           }
 
+      - name: Get version and build number
+        id: get_version
+        run: |
+          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc | cut -d '.' -f1,2)
+          BUILD_NUMBER=${{ github.run_number }}
+          FINAL_VERSION="${BASE_VERSION}.${BUILD_NUMBER}"
+
+          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+          echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Поточна збірка: v$FINAL_VERSION"
+
       - name: Auto Tag from TOC File
         run: |
-          VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc)
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag -a "v$VERSION" -m "Release v$VERSION"
-          git push origin "v$VERSION"
+          VERSION=${{ env.FINAL_VERSION }}
+          TAG="v$VERSION"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Тег $TAG вже існує. Пропускаємо створення."
+          else
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install and Run Luacheck
+        uses: nebularg/actions-luacheck@v1
+        with:
+          args: "--no-color -q"
+          annotate: warning
+
+      - name: Update CurseForge Translations
+        run: ./update_translations.sh
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
 
       - name: Generate Changelog
         run: ./generate_changelog.sh
@@ -63,7 +93,10 @@ jobs:
         uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+
       - name: Add Summary
         run: |
           echo "## ✅ CI завершено успішно" >> $GITHUB_STEP_SUMMARY
@@ -74,6 +107,3 @@ jobs:
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           status: ${{ job.status }}
-
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}p
