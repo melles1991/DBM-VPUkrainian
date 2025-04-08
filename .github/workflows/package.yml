@@ -65,7 +65,11 @@ jobs:
 
       - name: Generate Changelog
         run: ./generate_changelog.sh
-
+        
+      - name: Show Generated Changelog
+        run: |
+          cat CHANGELOG.md
+          
       - name: Update Build Date in .toc file
         run: |
           DATE=$(date +%Y%m%d%H%M)
