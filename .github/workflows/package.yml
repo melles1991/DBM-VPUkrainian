@@ -12,6 +12,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    permissions:
+       contents: write
+       issues: write
+       pull-requests: write
+       id-token: write
 
     steps:
       - name: Checkout Repository
@@ -54,8 +59,6 @@ jobs:
           tag_name: "v${{ env.FINAL_VERSION }}"
           name: "v${{ env.FINAL_VERSION }}"
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
