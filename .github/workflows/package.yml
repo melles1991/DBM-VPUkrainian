@@ -70,7 +70,8 @@ jobs:
         with:
           tag_name: "v${{ env.FINAL_VERSION }}"
           name: "v${{ env.FINAL_VERSION }}"
-          file: "${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip"
+          files: ${{ github.workspace }}/DBM-VPUkrainian-${{ env.FINAL_VERSION }}.zip
+          token: ${{ secrets.GH_TOKEN }}
           prerelease: false
 
       - name: Create and Upload Package
