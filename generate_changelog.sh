@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Отримуємо значення FINAL_VERSION з GitHub Actions середовища
-version="${{ env.FINAL_VERSION }}"  # Використовуємо передану змінну FINAL_VERSION
+version="$FINAL_VERSION"  # Використовуємо передану змінну FINAL_VERSION
 
 # Для отримання попереднього тегу використовуємо git describe
 tag=$(git describe --tags --always --abbrev=0)
