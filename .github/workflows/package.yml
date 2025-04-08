@@ -1,33 +1,79 @@
-name: Build and Deploy Addon
+name: Continuous Integration
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+      - "!**-alpha**"
+      - "!**-beta**"
 
 jobs:
-  package:
-    name: Create and Deploy Addon
+  build:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      id-token: write
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate CHANGELOG.md
-        uses: orhun/git-cliff-action@v2
-        with:
-          config: cliff.toml
-          args: --verbose
+      - name: Workaround Checkout Tag Fetch Issue
+        run: |
+          git fetch --tags --force
+
+      - name: Print Debug Info
+        run: |
+          echo "Tag: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: Validate .toc File Version
+        run: |
+          grep -q '^## Version:' DBM-VPUkrainian-Mainline.toc || {
+            echo "Version not found in TOC file" >&2
+            exit 1
+          }
+
+      - name: Auto Tag from TOC File
+        run: |
+          VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc)
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
         env:
-          OUTPUT: CHANGELOG.md
-          
-      - name: Deploy AddOn
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+      - name: Generate Changelog
+        run: ./generate_changelog.sh
+
+      - name: Update Build Date in .toc file
+        run: |
+          DATE=$(date +%Y%m%d%H%M)
+          sed -i "s/@build-time@/$DATE/" DBM-VPUkrainian-Mainline.toc
+
+      - name: Flag Non-Experimental Build
+        run: |
+          sed -i \
+            -e "s/--@experimental@/--[=====[@experimental@/" \
+            -e "s/--@end-experimental@/--@end-experimental@]=====]/" DBM-VPUkrainian-Mainline.toc
+
+      - name: Create and Upload Package
         uses: BigWigsMods/packager@v2
         env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
+      - name: Add Summary
+        run: |
+          echo "## ✅ CI завершено успішно" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Discord on Failure
+        if: failure()
+        uses: nebularg/actions-discord-webhook@v1
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          status: ${{ job.status }}
+
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}p
