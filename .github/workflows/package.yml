@@ -77,7 +77,7 @@ jobs:
           ZIP_FILE="${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip"
           if [ -f "$ZIP_FILE" ]; then
             echo "Uploading release asset: $ZIP_FILE"
-            gh release upload "v${{ env.FINAL_VERSION }}" "$ZIP_FILE" --repo ${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
+            gh release upload "v${{ env.FINAL_VERSION }}" "$ZIP_FILE" --repo ${{ github.repository }}
           else
             echo "File $ZIP_FILE not found, skipping upload."
             exit 1
