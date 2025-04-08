@@ -35,7 +35,7 @@ jobs:
 
       - name: Validate .toc File Version
         run: |
-          grep -q '^## Version:' DBM-VPUkrainian-Mainline.toc || {
+          grep -q '^## Version:' DBM-VPUkrainian.toc || {
             echo "Version not found in TOC file" >&2
             exit 1
           }
@@ -43,7 +43,7 @@ jobs:
       - name: Get version and build number
         id: get_version
         run: |
-          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc | cut -d '.' -f1,2)
+          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian.toc | cut -d '.' -f1,2)
           BUILD_NUMBER=${{ github.run_number }}
           FINAL_VERSION="${BASE_VERSION}.${BUILD_NUMBER}"
 
@@ -55,7 +55,7 @@ jobs:
 
       - name: Update Version in .toc File
         run: |
-          sed -i "s/^## Version: .*/## Version: ${FINAL_VERSION}/" DBM-VPUkrainian-Mainline.toc
+          sed -i "s/^## Version: .*/## Version: ${FINAL_VERSION}/" DBM-VPUkrainian.toc
           echo "Version in .toc file updated to ${FINAL_VERSION}"
 
       - name: Make Changelog Script Executable
