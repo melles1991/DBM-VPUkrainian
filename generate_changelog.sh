@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Визначаємо поточний і попередній тег
-version=$(git describe --tags --always)
+# Визначаємо поточний тег без суфікса git hash
+version=$(git describe --tags --always | sed 's/-g.*//')
 tag=$(git describe --tags --always --abbrev=0)
 
 # Якщо ми на теге, шукаємо попередній тег
@@ -37,6 +37,10 @@ if [ "$version" = "$tag" ]; then
   highlights=$(git cat-file -p "$tag" | sed -e '1,5d' -e '/^-----BEGIN PGP/,/^-----END PGP/d')
   echo -ne "## Highlights\n\n${highlights}\n\n## Commits\n\n" >> "CHANGELOG.md"
 fi
+
+# Додаємо коміти між попереднім і поточним тегом
+git shortlog --no-merges --reverse "$previous..$current" | sed -e '/^\w/G' -e 's/^      /- /' >> "CHANGELOG.md"
+
 
 # Додаємо коміти між попереднім і поточним тегом
 git shortlog --no-merges --reverse "$previous..$current" | sed -e '/^\w/G' -e 's/^      /- /' >> "CHANGELOG.md"
