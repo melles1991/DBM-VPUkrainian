@@ -77,11 +77,13 @@ jobs:
           ZIP_FILE="${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip"
           if [ -f "$ZIP_FILE" ]; then
             echo "Uploading release asset: $ZIP_FILE"
-            gh release upload "v${{ env.FINAL_VERSION }}" "$ZIP_FILE" --repo ${{ github.repository }}
+            gh release upload "v${{ env.FINAL_VERSION }}" "$ZIP_FILE" --repo ${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
           else
             echo "File $ZIP_FILE not found, skipping upload."
             exit 1
           fi
+        env:
+          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
 
       - name: Create and Upload Package
         uses: BigWigsMods/packager@v2
@@ -99,4 +101,3 @@ jobs:
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           status: ${{ job.status }}
-
