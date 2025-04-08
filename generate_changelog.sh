@@ -1,22 +1,15 @@
 #!/bin/bash
 
-# Визначаємо поточний тег без суфікса git hash
-version=$(git describe --tags --always | sed 's/-g.*//')
+# Отримуємо значення FINAL_VERSION з GitHub Actions середовища
+version="${{ env.FINAL_VERSION }}"  # Використовуємо передану змінну FINAL_VERSION
+
+# Для отримання попереднього тегу використовуємо git describe
 tag=$(git describe --tags --always --abbrev=0)
 
-# Якщо ми на теге, шукаємо попередній тег
+# Якщо на теге, шукаємо попередній тег
 if [ "$version" = "$tag" ]; then
   current="$tag"
   previous=$(git describe --tags --abbrev=0 HEAD~1)  # Шукаємо попередній тег
-  if [[ $previous == *beta* ]]; then
-    if [[ $tag == *beta* ]]; then
-      previous=$(git describe --tags --abbrev=0 HEAD~1)
-    else
-      previous=$(git describe --tags --abbrev=0 --exclude="*beta*" HEAD~1)
-    fi
-  else
-    previous=$(git describe --tags --abbrev=0 HEAD~1)
-  fi
 else
   current=$(git log -1 --format="%H")
   previous="$tag"
@@ -29,7 +22,7 @@ date=$(git log -1 --date=short --format="%ad")
 url=$(git remote get-url origin | sed -e 's/^git@\(.*\):/https:\/\/\1\//' -e 's/\.git$//')
 
 # Створення CHANGELOG.md
-echo -ne "# [${version}](${url}/tree/${current}) ($date)\n\n[Full Changelog](${url}/compare/${previous}...${current})\n\n" > "CHANGELOG.md"
+echo -ne "# [v${version}](${url}/tree/${current}) ($date)\n\n[Full Changelog](${url}/compare/v${version}...${current})\n\n" > "CHANGELOG.md"
 
 # Якщо на теге, додаємо опис релізу
 if [ "$version" = "$tag" ]; then
@@ -40,8 +33,3 @@ fi
 
 # Додаємо коміти між попереднім і поточним тегом
 git shortlog --no-merges --reverse "$previous..$current" | sed -e '/^\w/G' -e 's/^      /- /' >> "CHANGELOG.md"
-
-
-# Додаємо коміти між попереднім і поточним тегом
-git shortlog --no-merges --reverse "$previous..$current" | sed -e '/^\w/G' -e 's/^      /- /' >> "CHANGELOG.md"
-
