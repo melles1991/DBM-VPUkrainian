@@ -58,6 +58,12 @@ jobs:
           sed -i "s/^## Version: .*/## Version: ${FINAL_VERSION}/" DBM-VPUkrainian-Mainline.toc
           echo "Version in .toc file updated to ${FINAL_VERSION}"
 
+      - name: Make Changelog Script Executable
+        run: chmod +x ./generate_changelog.sh    
+
+      - name: Generate Changelog
+        run: ./generate_changelog.sh
+        
       - name: Pack Addon (.zip)
         run: |
           ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
@@ -71,12 +77,6 @@ jobs:
           name: "v${{ env.FINAL_VERSION }}"
           files: ${{ github.workspace }}/DBM-VPUkrainian-${{ env.FINAL_VERSION }}.zip
           prerelease: false
-
-      - name: Make Changelog Script Executable
-        run: chmod +x ./generate_changelog.sh    
-
-      - name: Generate Changelog
-        run: ./generate_changelog.sh
         
       - name: Create and Upload Package
         uses: BigWigsMods/packager@v2
