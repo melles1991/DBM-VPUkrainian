@@ -83,7 +83,7 @@ jobs:
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
-          ADDON_FILE: ${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip
+          si_project_version: ${{ env.FINAL_VERSION }}
 
       - name: Add Summary
         run: |
