@@ -62,7 +62,7 @@ jobs:
       - name: Pack Addon (.zip)
         run: |
           ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
-          zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ${GITHUB_WORKSPACE}/
+          zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ./*
           echo "Addon packed as ${ZIP_NAME}"
           
       - name: Create GitHub Release
