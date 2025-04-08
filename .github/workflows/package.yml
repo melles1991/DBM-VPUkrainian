@@ -12,11 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      id-token: write
 
     steps:
       - name: Checkout Repository
@@ -52,40 +47,40 @@ jobs:
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
           echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
           echo "📦 Поточна збірка: v$FINAL_VERSION"
-
+      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "v${{ env.FINAL_VERSION }}"
           name: "v${{ env.FINAL_VERSION }}"
           prerelease: false
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
 
       - name: Generate Changelog
         run: ./generate_changelog.sh
-        
-      - name: Show Generated Changelog
-        run: |
-          cat CHANGELOG.md
-          
-      - name: Update Build Date in .toc file
-        run: |
-          DATE=$(date +%Y%m%d%H%M)
-          sed -i "s/@build-time@/$DATE/" DBM-VPUkrainian-Mainline.toc
 
-      - name: Flag Non-Experimental Build
+      - name: Pack Addon
         run: |
-          sed -i \
-            -e "s/--@experimental@/--[=====[@experimental@/" \
-            -e "s/--@end-experimental@/--@end-experimental@]=====]/" DBM-VPUkrainian-Mainline.toc
+          ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
+          zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ${GITHUB_WORKSPACE}/
+          echo "Addon packed as ${ZIP_NAME}"
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.FINAL_VERSION }}"
+          files: |
+            ${GITHUB_WORKSPACE}/DBM-VPUkrainian-${FINAL_VERSION}.zip
 
       - name: Create and Upload Package
         uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}  # Токен для доступу до репозиторію
+          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
 
       - name: Add Summary
         run: |
