@@ -47,17 +47,18 @@ jobs:
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
           echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
           echo "📦 Поточна збірка: v$FINAL_VERSION"
-      
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "v${{ env.FINAL_VERSION }}"
           name: "v${{ env.FINAL_VERSION }}"
           prerelease: false
-          
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}  # Використовуємо токен з правами на релізи
+
       - name: Make Changelog Script Executable
         run: chmod +x ./generate_changelog.sh    
-        
+
       - name: Generate Changelog
         run: ./generate_changelog.sh
 
@@ -76,7 +77,7 @@ jobs:
         uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}  # Токен для доступу до репозиторію
 
       - name: Add Summary
         run: |
