@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Get version from .toc file
         id: get_version
         run: |
@@ -29,12 +30,12 @@ jobs:
           echo "📦 Поточна версія з TOC: $BASE_VERSION"
           echo "Будівельний номер: $BUILD_NUMBER"
           echo "Нова версія (з номером збірки): $FINAL_VERSION"
-          
+
       - name: Get previous tag (if any)
         id: get_latest
         run: |
-          # Отримуємо попередній тег або встановлюємо початковий "v0.0.0" якщо тегів немає
-          tag=$(git describe --tags --abbrev=0 2>/dev/null || echo ${{ steps.get_version.outputs.version }})
+          # Спробуємо отримати попередній тег. Якщо він відсутній, встановимо значення з TOC.
+          tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "latest=$tag" >> $GITHUB_OUTPUT
           echo "Попередній тег: $tag"
 
