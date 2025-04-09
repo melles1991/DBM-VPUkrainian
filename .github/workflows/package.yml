@@ -17,7 +17,10 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
-
+      
+    outputs:
+      changeLogText: ${{ steps.readChanglog.outputs.text }}
+      
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -62,28 +65,23 @@ jobs:
         run: chmod +x ./generate_changelog.sh    
 
       - name: Generate Changelog
+        id: Changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         run: ./generate_changelog.sh
         
-      - name: Pack Addon (.zip)
-        run: |
-          ZIP_NAME="DBM-VPUkrainian-${FINAL_VERSION}.zip"
-          zip -r ${GITHUB_WORKSPACE}/${ZIP_NAME} ./*
-          echo "Addon packed as ${ZIP_NAME}"
-          
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Save Changelog in Variable
+        uses: Stanzilla/cat@2.0.2
+        id: readChanglog
         with:
-          tag_name: "v${{ env.FINAL_VERSION }}"
-          name: "v${{ env.FINAL_VERSION }}"
-          files: ${{ github.workspace }}/DBM-VPUkrainian-${{ env.FINAL_VERSION }}.zip
-          prerelease: false
-        
+          path: CHANGELOG.md
+
+      # once cloned, we just run the GitHub Action for the packager project
       - name: Create and Upload Package
-        uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
-          si_project_version: ${{ env.FINAL_VERSION }}
+        uses: BigWigsMods/packager@v2
 
       - name: Add Summary
         run: |
