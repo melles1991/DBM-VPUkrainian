@@ -14,6 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Fetch all tags from remote
+        run: |
+          echo "Fetching all remote tags..."
+          git fetch --tags
+
       - name: Remove all local tags
         run: |
           echo "Deleting all local tags..."
