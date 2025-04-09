@@ -67,7 +67,7 @@ jobs:
       - name: Generate Changelog
         id: Changelog
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./generate_changelog.sh
         
       - name: Save Changelog in Variable
@@ -87,7 +87,7 @@ jobs:
       - name: Create and Upload Package
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
         uses: BigWigsMods/packager@v2
 
       - name: Add Summary
