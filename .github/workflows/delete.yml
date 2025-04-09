@@ -1,0 +1,51 @@
+name: Delete All Tags and Releases
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete_tags_and_releases:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch all tags from remote
+        run: |
+          echo "Fetching all remote tags..."
+          git fetch --tags
+
+      - name: Remove all local tags
+        run: |
+          echo "Deleting all local tags..."
+          git tag -l | xargs git tag -d
+
+      - name: Remove all remote tags
+        run: |
+          echo "Deleting all remote tags..."
+          TAGS=$(git tag -l)
+          if [ -n "$TAGS" ]; then
+            git push --delete origin $TAGS
+          else
+            echo "No tags found to delete"
+          fi
+
+      - name: Delete all releases on GitHub
+        run: |
+          echo "Deleting all releases on GitHub..."
+
+          # Get all release IDs from GitHub API
+          RELEASE_IDS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" | \
+            jq -r '.[].id')
+
+          # Loop through release IDs and delete each release
+          for ID in $RELEASE_IDS; do
+            echo "Deleting release with ID: $ID"
+            curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/$ID"
+          done

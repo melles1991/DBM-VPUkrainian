@@ -1,0 +1,75 @@
+name: Continuous Integration
+
+on:
+  push:
+    tags:
+      - "*"
+      - "!**-alpha**"
+      - "!**-beta**"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    outputs:
+      changeLogText: ${{ steps.readChanglog.outputs.text }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all tags (required for next steps)
+        run: git fetch --tags --force
+
+      - name: Get Latest Tag as FINAL_VERSION
+        id: get_latest_tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "FINAL_VERSION=$LATEST_TAG" >> $GITHUB_ENV
+          echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "🧷 Поточна версія: $LATEST_TAG"
+
+      - name: Print Debug Info
+        run: |
+          echo "Tag: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Версія (з тегу): $FINAL_VERSION"
+
+      - name: Update Version in .toc File
+        run: |
+          sed -i "s/^## Version: .*/## Version: ${FINAL_VERSION}/" DBM-VPUkrainian.toc
+          echo "✅ .toc файл оновлено до версії ${FINAL_VERSION}"
+
+      - name: Make Changelog Script Executable
+        run: chmod +x ./generate_changelog.sh    
+
+      - name: Generate Changelog
+        id: Changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./generate_changelog.sh
+
+      - name: Save Changelog in Variable
+        uses: Stanzilla/cat@2.0.2
+        id: readChanglog
+        with:
+          path: CHANGELOG.md
+
+      - name: Create and Upload Package
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+        uses: BigWigsMods/packager@v2
+
+      - name: Add Summary
+        run: |
+          echo "## ✅ CI завершено успішно" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Discord on Failure
+        if: failure()
+        uses: nebularg/actions-discord-webhook@v1
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          status: ${{ job.status }}
