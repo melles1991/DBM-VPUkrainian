@@ -1,53 +1,50 @@
-name: Continuous Integration
+name: Auto GitHub Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 jobs:
-  create_release:
-    name: Create and Deploy Pre-release
-    runs-on: ubuntu-22.04
+  release:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
-      id-token: write
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get version and build number
+      - name: Get previous tag
+        id: get_latest
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          echo "latest=$tag" >> $GITHUB_OUTPUT
+
+      - name: Get version from .toc file
         id: get_version
         run: |
-          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian-Mainline.toc | cut -d '.' -f1,2)
-          BUILD_NUMBER=${{ github.run_number }}
+          BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian.toc | cut -d '.' -f1,2)
+          BUILD_NUMBER=${{ github.run_number }}  # Отримуємо поточний номер збірки
           FINAL_VERSION="${BASE_VERSION}.${BUILD_NUMBER}"
-
-          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
-          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
-          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+          
+          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV  # Зберігаємо FINAL_VERSION у середовищі
           echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Поточна збірка: v$FINAL_VERSION"
+          echo "📦 Поточна версія з TOC: $BASE_VERSION"
+          echo "Будівельний номер: $BUILD_NUMBER"
+          echo "Нова версія (з номером збірки): $FINAL_VERSION"
 
-      - name: Create GitHub Release
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ steps.get_version.outputs.version }}
+          git push origin ${{ steps.get_version.outputs.version }}
+
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ env.FINAL_VERSION }}"
-          name: "v${{ env.FINAL_VERSION }}"
-          prerelease: false
-
-      - name: Trigger workflow to publish new version
-        run: |
-          curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.REPO_ACCESS_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/LihvoDruida/DBM-VPUkrainian/actions/workflows/package.yml/dispatches \
-          -d '{"ref":"main"}'
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Release ${{ steps.get_version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
