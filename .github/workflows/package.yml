@@ -76,6 +76,13 @@ jobs:
         with:
           path: CHANGELOG.md
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.FINAL_VERSION }}"
+          name: "v${{ env.FINAL_VERSION }}"
+          prerelease: false
+
       # once cloned, we just run the GitHub Action for the packager project
       - name: Create and Upload Package
         env:
