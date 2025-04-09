@@ -15,12 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get previous tag
-        id: get_latest
-        run: |
-          tag=$(git describe --tags --abbrev=0)
-          echo "latest=$tag" >> $GITHUB_OUTPUT
-
       - name: Get version from .toc file
         id: get_version
         run: |
@@ -34,6 +28,21 @@ jobs:
           echo "Будівельний номер: $BUILD_NUMBER"
           echo "Нова версія (з номером збірки): $FINAL_VERSION"
 
+      - name: Get previous tag (if any)
+        id: get_latest
+        run: |
+          # Перевіримо, чи є теги
+          TAGS=$(git tag -l)
+          if [ -z "$TAGS" ]; then
+            # Якщо тегів немає, використовуємо значення з TOC
+            tag="v0.0.0"
+          else
+            # Якщо теги є, беремо останній тег
+            tag=$(git describe --tags --abbrev=0)
+          fi
+          echo "latest=$tag" >> $GITHUB_OUTPUT
+          echo "Попередній тег: $tag"
+          
       - name: Create Git tag
         run: |
           git config user.name "github-actions"
