@@ -18,11 +18,8 @@ jobs:
       - name: Get version from .toc file
         id: get_version
         run: |
-          # Отримуємо базову версію з .toc файлу (перші два числа версії)
           BASE_VERSION=$(grep -oP '^## Version: \K.*' DBM-VPUkrainian.toc | cut -d '.' -f1,2)
-          # Отримуємо поточний номер збірки
-          BUILD_NUMBER=${{ github.run_number }}  
-          # Формуємо фінальну версію
+          BUILD_NUMBER=${{ github.run_number }}  # Отримуємо поточний номер збірки
           FINAL_VERSION="v${BASE_VERSION}.${BUILD_NUMBER}"
           
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV  # Зберігаємо FINAL_VERSION у середовищі
@@ -50,7 +47,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          # Створюємо новий тег з FINAL_VERSION
           git tag ${{ steps.get_version.outputs.version }}
           git push origin ${{ steps.get_version.outputs.version }}
 
