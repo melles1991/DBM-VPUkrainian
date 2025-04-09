@@ -22,7 +22,12 @@ jobs:
       - name: Remove all remote tags
         run: |
           echo "Deleting all remote tags..."
-          git push --delete origin $(git tag -l)
+          TAGS=$(git tag -l)
+          if [ -n "$TAGS" ]; then
+            git push --delete origin $TAGS
+          else
+            echo "No tags found to delete"
+          fi
 
       - name: Delete all releases on GitHub
         run: |
